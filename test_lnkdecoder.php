@@ -40,7 +40,8 @@ function separator () {
 $msshlnk = array();
 //$FOLDER = 'samples';
 $FOLDER = 'lnk_files';
-$test_files = new DirectoryIterator($FOLDER);
+//$test_files = new DirectoryIterator($FOLDER);
+$test_files = array('mysqlwb.lnk','named-file.lnk','remote-disk-sdelete.exe.lnk','Notepad.lnk');
 //$test_files = array('mysqlwb.lnk','named-file.lnk');
 
 echo "======== Test Suite for MSSHLNK =======" . PHP_EOL;
