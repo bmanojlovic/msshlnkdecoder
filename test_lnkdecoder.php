@@ -1,5 +1,9 @@
 <?php
-include "lnkdecoder.class.php";
+/**
+ * @desc simple test script for lnkdecoder.class.php
+ * 
+ */
+require 'lnkdecoder.class.php';
 
 // http://www.php.net/manual/en/function.chr.php#89488
 function echocolor($text,$color="normal",$back=0)
@@ -22,53 +26,53 @@ function echocolor($text,$color="normal",$back=0)
   }
 }
 
-function failed () {
+function failed () 
+{
   echocolor(" FAILED",$color="red",$back=0);
 }
 
-function passed () {
+function passed () 
+{
   echocolor(" PASSED",$color="green",$back=0);
 }
 
-function separator () {
+function separator () 
+{
   echocolor ("          =====", $color="magenta",$back=0);
 }
 
 
-//$test_files = array('paint.zip.lnk','winhelp.maximized.lnk');
-//$test_files = array('IO.SYS.lnk');
 $msshlnk = array();
-//$FOLDER = 'samples';
 $FOLDER = 'lnk_files';
 $test_files = new DirectoryIterator($FOLDER);
-//$test_files = array('mysqlwb.lnk','named-file.lnk');
 
+echo "=======================================" . PHP_EOL;
 echo "======== Test Suite for MSSHLNK =======" . PHP_EOL;
 echo "=======================================" . PHP_EOL;
 echo "             Opening Files" . PHP_EOL;
 echo "=======================================" . PHP_EOL;
 
-foreach ($test_files as $file) { 
-  //
-  $file_fixed = str_replace(' ','_',$file);
-  if ($file == '.' || $file == '..') continue; 
-  echo "Opening lnk file \"" . $FOLDER . DIRECTORY_SEPARATOR . $file . '"... ' ; 
-  $msshlnk[$file_fixed] = new MSshlnk();
-  if (!$msshlnk[$file_fixed]->open($FOLDER . DIRECTORY_SEPARATOR . $file)) {
-    failed() . PHP_EOL;
-    echo "      errno="
+foreach ($test_files as $file) 
+{ 
+  if (!$test_files->isDot()) {
+    $f = $file->getFilename();
+    echo 'Opening lnk file "' . $f . '"... ' ;
+    //var_dump($file);
+    $msshlnk[$f] = new MSshlnk();
+    if (!$msshlnk[$f]->open($file->getPathname())) {
+        failed() . PHP_EOL;
+        echo '      errno='
         . $msshlnk[$file_fixed]->errno
         . ' errstring="'
         . $msshlnk[$file_fixed]->errstring 
         . '"' . PHP_EOL;
-    unset($msshlnk[$file_fixed]);
-  } else {
-     passed() . PHP_EOL;
+        unset($msshlnk[$f]);
+      } else {
+         passed() . PHP_EOL;
+      }
+      echo PHP_EOL;
   }
-  echo PHP_EOL;
 }
-
-
 
 foreach($msshlnk as $key => $lnk) {
   echo PHP_EOL;
@@ -86,11 +90,9 @@ echo "=======================================" . PHP_EOL;
 }
 
 
-//var_dump($msshlnk['winhelp.maximized.lnk']);
 
 
 
 //print_r( str_split($msshlnk[$key]->lnk_bin));
 
 echo "========== End of test suite ==========" . PHP_EOL;
-?>
