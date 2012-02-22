@@ -232,12 +232,15 @@ class MSshlnk {
   }
 
   public function parse() {
-        foreach ( $this->LinkFlags as $key => $val) {
-          if ($this->H_FLAG[$key][1] == true) {
-            $func="parse_$key";
-            $this->$func();
-          }
-        }
+    foreach ( $this->LinkFlags as $key => $val) {
+      if ($this->H_FLAG[$key][1] == true) {
+        $func="parse_$key";
+        $this->$func();
+      }
+    }
+    $this->get_CreationTime();
+    $this->get_AccessTime();
+    $this->get_WriteTime();
     
   }
   private function _is_msshlnk() {
@@ -298,7 +301,7 @@ class MSshlnk {
   }
 
   private function _OffsetForHasName() {
-    $this->StructSize['NameSize'] = $this->getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('NameSize')-2,2)),1);
+    $this->StructSize['NameSize'] = $this->getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('NameSize')-4,2)),1);
   }
 
   private function _OffsetForHasRelativePath() {
@@ -332,19 +335,13 @@ class MSshlnk {
   } // _get_File_Attributes
 
   public function get_CreationTime() {
-    // TODO
-    echo "Tough luck for this bad solution:) " . PHP_EOL;
-    return false;
+    $this->ParsedInfo['CreationTime'] = unpack("H*",substr($this->lnk_bin,28,8));
   }
   public function get_AccessTime() {
-    // TODO
-    echo "Tough luck for this bad solution:) " . PHP_EOL;
-    return false;
+   $this->ParsedInfo['AccessTime'] = unpack("H*",substr($this->lnk_bin,36,8));
   }
   public function get_WriteTime() {
-    // TODO
-    echo "Tough luck for this bad solution:) " . PHP_EOL;
-    return false;
+    $this->ParsedInfo['WriteTime'] = unpack("H*",substr($this->lnk_bin,44,8));
   }
 
 

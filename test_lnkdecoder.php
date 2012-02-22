@@ -81,7 +81,7 @@ foreach($msshlnk as $key => $lnk) {
   echo "        ===================            " . PHP_EOL;
   $lnk->parse();
 //  echo "LinkFlags= "; print_r($lnk->LinkFlags);
-//  echo "StructSize= "; print_r($lnk->StructSize);
+  echo "StructSize= "; print_r($lnk->StructSize);
   echo "ParsedInfo= "; @print_r($lnk->ParsedInfo);
 echo "=======================================" . PHP_EOL;
 }
