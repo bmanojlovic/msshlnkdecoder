@@ -43,7 +43,7 @@ function separator ()
 
 
 $msshlnk = array();
-$FOLDER = 'lnk_files';
+$FOLDER = 'samples';
 $test_files = new DirectoryIterator($FOLDER);
 
 echo "=======================================" . PHP_EOL;

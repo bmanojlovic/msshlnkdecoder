@@ -28,7 +28,8 @@ class MSshlnk {
   public $lnk_bin = null;
   public $errno = 0;
   public $errstring = "";
-
+  public $DEBUG = false;
+  
   // possible errors
   private $_ERROR = array();
 
@@ -265,14 +266,17 @@ class MSshlnk {
 
   public function parse() 
   {
-        foreach ( $this->LinkFlags as $key => $val) {
-          if ($this->H_FLAG[$key][1] == true) {
+    $this->get_CreationTime();
+    $this->get_AccessTime();
+    $this->get_WriteTime();      
+    foreach ( $this->LinkFlags as $key => $val) {
+        if ($this->H_FLAG[$key][1] == true) {
             $func="parse_$key";
             $this->$func();
           }
-        }
-    
+    }
   }
+  
   private function _is_msshlnk() 
   {
     if ($this->lnk_bin[0] != 'L') {
@@ -337,17 +341,26 @@ class MSshlnk {
 
   private function _OffsetForHasName() 
   {
-    $this->StructSize['NameSize'] = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('NameSize')-4,2)),1);
+    $this->StructSize['NameSize'] = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('NameSize')-2,2)),1);
   }
 
   private function _OffsetForHasRelativePath() 
   {
-    $this->StructSize['RelativePathSize'] = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('RelativePathSize'),2)),1);
+    $relativepath_size = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('RelativePathSize')-2,2)),1);
+    //echo "relativepath_size=" . $relativepath_size . PHP_EOL;
+    //echo "this->_RealOffset('RelativePathSize',true) == " . $this->_RealOffset('RelativePathSize',true) . PHP_EOL;
+    //echo "this->_RealOffset('RelativePathSize') == " . $this->_RealOffset('RelativePathSize') . PHP_EOL;
+    $this->ParsedInfo['LinkInfo']['RelativePath'] = substr($this->lnk_bin,$this->_RealOffset('RelativePathSize')-2,$relativepath_size*2);
+
   }
 
   private function _OffsetForHasWorkingDir() 
   {
-    $this->StructSize['WorkingDirSize'] = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('WorkingDirSize'),2)),1);
+    $workingdir_size = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('WorkingDirSize')-2,2)),1);
+    //echo "workingdir_size=" . $workingdir_size . PHP_EOL;
+    //echo "this->_RealOffset('WorkingDirSize',true) == " . $this->_RealOffset('WorkingDirSize',true) . PHP_EOL;
+    //echo "this->_RealOffset('WorkingDirSize') == " . $this->_RealOffset('WorkingDirSize') . PHP_EOL;
+    $this->ParsedInfo['LinkInfo']['WorkingDir'] = substr($this->lnk_bin,$this->_RealOffset('WorkingDirSize')-2,$workingdir_size*2);
   }
 
   private function _OffsetForHasArguments() 
@@ -377,23 +390,18 @@ class MSshlnk {
 
   public function get_CreationTime() 
   {
-    // TODO
-    echo "Tough luck for this bad solution:) " . PHP_EOL;
-    return false;
+    $this->ParsedInfo['CreationTime'] = unpack("H*",substr($this->lnk_bin,28,8));
   }
+  
   public function get_AccessTime() 
   {
-    // TODO
-    echo "Tough luck for this bad solution:) " . PHP_EOL;
-    return false;
+    $this->ParsedInfo['AccessTime'] = unpack("H*",substr($this->lnk_bin,36,8));
   }
+  
   public function get_WriteTime() 
   {
-    // TODO
-    echo "Tough luck for this bad solution:) " . PHP_EOL;
-    return false;
+    $this->ParsedInfo['WriteTime'] = unpack("H*",substr($this->lnk_bin,44,8));
   }
-
 
   public function get_FileSize() 
   {
