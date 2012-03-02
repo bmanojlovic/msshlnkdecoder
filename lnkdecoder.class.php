@@ -45,6 +45,7 @@ class MSshlnk {
   public $VolumeIDInfo = array();
   public $StructSize = array();
   public $KnownGUIDS = array();
+  private $ItemIDSize = -1;
 
   public function MSshlnk()
   {
@@ -480,20 +481,24 @@ class MSshlnk {
       return "PT_UNKNOWN";
   }
 
-  private function _get_ItemIDSize()
+  private function _get_ItemIDSize($offset)
   {
-      //
+      if ($this->ItemIDSize == -1)
+      {
+          $this->ItemIDSize = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('LinkTargetIDListSize')+2,2)),1);
+      } else
+      {
+          $this->ItemIDSize = $this->_getvalue(unpack('v',substr($this->lnk_bin,$offset,2),1));
+      }
+      return $this->ItemIDSize;
   }
   public function parse_HasLinkTargetIDList()
   {
     if (!isset($this->LinkFlags['HasLinkTargetIDList'])) return $this->_set_error(5);
-    print ( "XX=" . substr($this->lnk_bin,$this->_RealOffset('LinkTargetIDListSize')+24,$this->_RealOffset('LinkTargetIDListSize',true) - ($this->_RealOffset('LinkTargetIDListSize')+2)) . PHP_EOL);
-    $ItemIDSize = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('LinkTargetIDListSize')+2,2)),1);
-    $initial_offset = $this->_RealOffset('LinkTargetIDListSize')+2 + 2; // + IDListSize + ItemIDSize
     var_dump("----------------------");
-    while ($ItemIDSize != 0)
+    while ($this->_get_ItemIDSize() != 0)
     {
-        $val = substr($this->lnk_bin,$initial_offset+2,$ItemIDSize);
+        $val = substr($this->lnk_bin,$this->ItemIDSize,$ItemIDSize);
         if($ItemIDSize == 20)
         {
             var_dump($this->parse_guid($val));
