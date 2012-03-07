@@ -547,7 +547,7 @@ class MSshlnk {
     }
     $this->ParsedInfo['LinkInfo']['LinkInfoFlags'] = $this->LinkInfoFlags;
     $localbasepath_size = $this->LinkInfo['LinkInfoSize'] - $this->LinkInfo['CommonPathSuffixOffset'];
-    $this->ParsedInfo['LinkInfo']['CommonPathSuffix'] = substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['CommonPathSuffixOffset']),$localbasepath_size);
+    $this->ParsedInfo['LinkInfo']['CommonPathSuffix'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['CommonPathSuffixOffset']),$localbasepath_size))),0);
 
     // no need for foreach in here but just be consistent and future proof (if they decide to add more flags in future....)
     foreach ($this->LinkInfoFlags as $val) {
@@ -572,19 +572,19 @@ class MSshlnk {
       $VolumeLabelOffsetUnicode = $this->_getvalue(unpack('i',substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['VolumeIDOffset'] + 16),4)),1);
       $volume_id_size = $this->LinkInfo['VolumeIDSize'] - ($VolumeLabelOffsetUnicode + 4);
       // DO NOT just interpret this as is watch for local encoding on machine... - or better do not use local letters on storage names(labels)...
-      $this->ParsedInfo['LinkInfo']['VolumeID']['VolumeLabel'] = substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['VolumeIDOffset'] + 16),$volume_id_size);
+      $this->ParsedInfo['LinkInfo']['VolumeID']['VolumeLabel'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['VolumeIDOffset'] + 16),$volume_id_size))),0);
     } else {
       $volume_id_size = $this->LinkInfo['VolumeIDSize'] - $VolumeLabelOffset;
       // WARNING WARNING this value is always in local codepage (what ever is on user machine DO NOT assume you know what it is....)
-      $this->ParsedInfo['LinkInfo']['VolumeID']['VolumeLabel'] = substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['VolumeIDOffset'] + 16),$volume_id_size);
+      $this->ParsedInfo['LinkInfo']['VolumeID']['VolumeLabel'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['VolumeIDOffset'] + 16),$volume_id_size))),0);
     }
 
     $localbasepath_size = $this->LinkInfo['CommonPathSuffixOffset'] - $this->LinkInfo['LocalBasePathOffset'];
 
     if ($this->LinkInfo['LinkInfoHeaderSize'] >= 36) {
-      $this->ParsedInfo['LinkInfo']['VolumeID']['LocalBasePath'] = mb_convert_encoding(substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['LocalBasePathOffset']),$localbasepath_size), 'UTF-8','UTF-16LE');
+      $this->ParsedInfo['LinkInfo']['VolumeID']['LocalBasePath'] = $this->_getvalue(explode(chr(0), trim(mb_convert_encoding(substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['LocalBasePathOffset']),$localbasepath_size), 'UTF-8','UTF-16LE'))),0);
     } else {
-       $this->ParsedInfo['LinkInfo']['VolumeID']['LocalBasePath'] = substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['LocalBasePathOffset']),$localbasepath_size);
+       $this->ParsedInfo['LinkInfo']['VolumeID']['LocalBasePath'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['LocalBasePathOffset']),$localbasepath_size))),0);
     }
   }
 
@@ -614,7 +614,7 @@ class MSshlnk {
   private function _IfSet_ValidDevice()
   {
     $device_name_size = $this->LinkInfo['CommonNetworkRelativeLinkSize'] - $this->LinkInfo['DeviceNameOffset'];
-    $this->ParsedInfo['LinkInfo']['CommonNetworkRelative']['DeviceName'] = substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['CommonNetworkRelativeLinkOffset'] + $this->LinkInfo['DeviceNameOffset']),$device_name_size);
+    $this->ParsedInfo['LinkInfo']['CommonNetworkRelative']['DeviceName'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['CommonNetworkRelativeLinkOffset'] + $this->LinkInfo['DeviceNameOffset']),$device_name_size))),0);
   }
 
   private function _IfSet_ValidNetType()
@@ -624,7 +624,7 @@ class MSshlnk {
     } else {
       $net_name_size = $this->LinkInfo['CommonNetworkRelativeLinkSize'] - $this->LinkInfo['NetNameOffset'];
     }
-    $this->ParsedInfo['LinkInfo']['CommonNetworkRelative']['NetName'] = substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['CommonNetworkRelativeLinkOffset'] + $this->LinkInfo['NetNameOffset']),$net_name_size);
+    $this->ParsedInfo['LinkInfo']['CommonNetworkRelative']['NetName'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,($this->_RealOffset('LinkInfoSize') + $this->LinkInfo['CommonNetworkRelativeLinkOffset'] + $this->LinkInfo['NetNameOffset']),$net_name_size))),0);
     $this->ParsedInfo['LinkInfo']['CommonNetworkRelative']['NetworkProviderType'] = $this->_get_NetworkProvider($this->_getvalue(unpack('i',substr($this->lnk_bin,$this->_RealOffset('LinkInfoSize') + $this->LinkInfo['CommonNetworkRelativeLinkOffset'] + 16,4)),1));
   }
 // END OF LINKINFO PARSING FUNCTIONS
@@ -636,17 +636,17 @@ class MSshlnk {
     echo "NAME_SIZE=" . $name_size . PHP_EOL;
     echo "this->_RealOffset('NameSize',true) == " . $this->_RealOffset('NameSize',true) . PHP_EOL;
     echo "this->_RealOffset('NameSize') == " . $this->_RealOffset('NameSize') . PHP_EOL;
-    $this->ParsedInfo['LinkInfo']['Name'] = substr($this->lnk_bin,$this->_RealOffset('NameSize')-2,$name_size*2);
+    $this->ParsedInfo['LinkInfo']['Name'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,$this->_RealOffset('NameSize')-2,$name_size*2))),0);
   }
   public function parse_HasRelativePath() {
     if (!isset($this->LinkFlags['HasRelativePath'])) return $this->_set_error(5);
     $relativepath_size = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('RelativePathSize')-2,2)),1);
-    $this->ParsedInfo['LinkInfo']['RelativePath'] = substr($this->lnk_bin,$this->_RealOffset('RelativePathSize')-2,$relativepath_size*2);
+    $this->ParsedInfo['LinkInfo']['RelativePath'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,$this->_RealOffset('RelativePathSize')-2,$relativepath_size*2))),0);
   }
   public function parse_HasWorkingDir() {
     if (!isset($this->LinkFlags['HasWorkingDir'])) return $this->_set_error(5);
     $workingdir_size = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('WorkingDirSize')-2,2)),1);
-    $this->ParsedInfo['LinkInfo']['WorkingDir'] = substr($this->lnk_bin,$this->_RealOffset('WorkingDirSize')-2,$workingdir_size*2);
+    $this->ParsedInfo['LinkInfo']['WorkingDir'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,$this->_RealOffset('WorkingDirSize')-2,$workingdir_size*2))),0);
   }
 
   public function parse_HasArguments() {}
