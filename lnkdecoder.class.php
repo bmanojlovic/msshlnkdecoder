@@ -381,6 +381,7 @@ class MSshlnk {
 
   private function _OffsetForHasRelativePath()
   {
+    return true; // TODO
     $relativepath_size = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('RelativePathSize')-2,2)),1);
     //echo "relativepath_size=" . $relativepath_size . PHP_EOL;
     //echo "this->_RealOffset('RelativePathSize',true) == " . $this->_RealOffset('RelativePathSize',true) . PHP_EOL;
@@ -391,6 +392,7 @@ class MSshlnk {
 
   private function _OffsetForHasWorkingDir()
   {
+    return true; // TODO
     $workingdir_size = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('WorkingDirSize')-2,2)),1);
     //echo "workingdir_size=" . $workingdir_size . PHP_EOL;
     //echo "this->_RealOffset('WorkingDirSize',true) == " . $this->_RealOffset('WorkingDirSize',true) . PHP_EOL;
