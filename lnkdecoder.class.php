@@ -494,6 +494,7 @@ class MSshlnk {
   }
   public function parse_HasLinkTargetIDList()
   {
+    return true; // TODO
     if (!isset($this->LinkFlags['HasLinkTargetIDList'])) return $this->_set_error(5);
     var_dump("----------------------");
     while ($this->_get_ItemIDSize() != 0)
@@ -631,6 +632,7 @@ class MSshlnk {
 
 
   public function parse_HasName() {
+    return true; // TODO
     if (!isset($this->LinkFlags['HasName'])) return $this->_set_error(5);
     $name_size = $this->_RealOffset('NameSize',true) - $this->_RealOffset('NameSize');
     echo "NAME_SIZE=" . $name_size . PHP_EOL;
@@ -639,11 +641,13 @@ class MSshlnk {
     $this->ParsedInfo['LinkInfo']['Name'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,$this->_RealOffset('NameSize')-2,$name_size*2))),0);
   }
   public function parse_HasRelativePath() {
+    return true; // TODO
     if (!isset($this->LinkFlags['HasRelativePath'])) return $this->_set_error(5);
     $relativepath_size = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('RelativePathSize')-2,2)),1);
     $this->ParsedInfo['LinkInfo']['RelativePath'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,$this->_RealOffset('RelativePathSize')-2,$relativepath_size*2))),0);
   }
   public function parse_HasWorkingDir() {
+    return true; // TODO
     if (!isset($this->LinkFlags['HasWorkingDir'])) return $this->_set_error(5);
     $workingdir_size = $this->_getvalue(unpack('v',substr($this->lnk_bin,$this->_RealOffset('WorkingDirSize')-2,2)),1);
     $this->ParsedInfo['LinkInfo']['WorkingDir'] = $this->_getvalue(explode(chr(0), trim(substr($this->lnk_bin,$this->_RealOffset('WorkingDirSize')-2,$workingdir_size*2))),0);
